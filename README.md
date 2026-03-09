@@ -2,8 +2,6 @@
 
 Numerical model built in Python that calculates and visualizes the full stress distribution across a trapezoidal cross-section beam under combined loading conditions.
 
-![Stress Distribution](stress_distribution.png)
-
 ## What it does
 
 Given a trapezoidal beam with configurable geometry and loading, the model computes:
