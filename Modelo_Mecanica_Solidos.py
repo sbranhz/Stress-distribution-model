@@ -1,23 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ─── Parámetros de la sección transversal ───────────────────────────────────
+# Parametros de la sección transversal
 ac = 50        # Ancho en la parte superior (mm)
 ap = 70        # Ancho en la parte inferior (mm)
 h  = 100       # Altura de la viga (mm)
 b  = 1         # Espesor (mm)
 
-# ─── Parámetros de carga y material ─────────────────────────────────────────
+# Parametros de carga y material
 g   = 9.8e3    # Gravedad (mm/s²)
 f   = 1.04e6   # Carga distribuida aplicada (N/mm)
-gc  = 2.3 * g  # Peso específico del material (N/mm³)
-r   = 10       # Resolución de la malla (puntos)
+gc  = 2.3 * g  # Peso especifico del material (N/mm³)
+r   = 10       # Resolucion de la malla (puntos)
 
-# ─── Flags de configuración ──────────────────────────────────────────────────
+# Flags de configuracion
 body = True    # Incluir peso propio de la viga
 uni  = False   # True = carga uniforme, False = carga triangular
 
-# ─── Peso propio y geometría ─────────────────────────────────────────────────
+# Peso propio y geometria
 w = (ac + ap) * h * b * gc / 2
 y = np.linspace(h, 0, r)
 Y = np.zeros((r, r))
@@ -28,19 +28,19 @@ for i in range(r):
 m = (ac - ap) / h
 a = m * y + ap
 
-# ─── Cortante basal ──────────────────────────────────────────────────────────
+# Cortante basal
 if uni:
     vb = f * h
 else:
     vb = f * h / 2
 
-# ─── Centro de gravedad del peso propio ──────────────────────────────────────
+# Centro de gravedad del peso propio
 if body:
     cb = (ap / 2) - (ac * (3 * ac + (ap - ac) ** 2) / (3 * ac + 3 * ap))
 else:
     cb = 0
 
-# ─── Momento en la base ──────────────────────────────────────────────────────
+# Momento en la base
 if uni:
     Mb = vb * h / 2
 else:
@@ -48,14 +48,14 @@ else:
 if body:
     Mb = Mb - w * cb
 
-# ─── Momento flector a lo largo de y ─────────────────────────────────────────
+# Momento flector a lo largo de y
 if uni:
     My = -Mb + f * y ** 2 / 2
 else:
     t  = f - f * y / h
     My = -Mb + vb * y - (t + f) * y ** 2 / 4
 
-# ─── Esfuerzo normal Syy ─────────────────────────────────────────────────────
+# Esfuerzo normal Syy
 Eny = a / 2
 cx  = np.zeros((r, r))
 for i in range(r):
@@ -81,7 +81,7 @@ Sy1  = np.flip(Sy1, 0)
 Syyy = Sy1 + Sy
 Syy1 = np.flip(Syy, 1)
 
-# ─── Esfuerzo cortante Txy ───────────────────────────────────────────────────
+# Esfuerzo cortante Txy
 if uni:
     vy = vb - f * y
 else:
@@ -110,7 +110,7 @@ for i in range(r):
     for j in range(r):
         Txy[i][j] = vy[i] * Q[i, j] / (Iy[i] * b)
 
-# ─── Esfuerzo normal Sxx ─────────────────────────────────────────────────────
+# Esfuerzo normal Sxx
 x  = np.linspace(ap, 0, r)
 X  = np.zeros((r, r))
 for i in range(r):
@@ -197,13 +197,13 @@ for i in range(r):
             Sxx[0, j] = Sxx[1, j] * 2
 Sxx = np.flip(np.flip(Sxx, 1), 0)
 
-# ─── Esfuerzos principales ───────────────────────────────────────────────────
+# Esfuerzos principales
 Sc   = (Sxx + Syy) / 2
 Tmax = (((Sxx - Syy) / 2) ** 2 + Txy ** 2) ** 0.5
 Smin = np.flip(Tmax - Sc, 1)
 Smax = Tmax + Sc
 
-# ─── Visualización ───────────────────────────────────────────────────────────
+# Visualización
 fig, axes = plt.subplots(2, 3, figsize=(15, 9))
 fig.suptitle("Distribución de Esfuerzos — Viga Trapezoidal", fontsize=14, fontweight='bold')
 
